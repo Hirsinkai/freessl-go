@@ -6,9 +6,8 @@ name: Go Multi-Platform Build and Release with Makefile
 
 # 定义工作流的触发条件，当有新的标签被推送到仓库时触发
 on:
-  push:
-    tags:
-      - '*'
+  release:
+    types: [created]
 
 # 定义工作流中的任务
 jobs:
