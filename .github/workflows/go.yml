@@ -1,0 +1,108 @@
+# This workflow will build a golang project for multiple platforms using Makefile and create a GitHub release
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
+
+# 定义工作流的名称，将显示在 GitHub Actions 界面中
+name: Go Multi-Platform Build and Release with Makefile
+
+# 定义工作流的触发条件，当有新的标签被推送到仓库时触发
+on:
+  push:
+    tags:
+      - '*'
+
+# 定义工作流中的任务
+jobs:
+  # 定义名为 build 的任务
+  build:
+    # 指定任务运行的环境，这里使用最新的 Ubuntu 系统
+    runs-on: ubuntu-latest
+    # 定义任务的具体步骤
+    steps:
+      # 使用 actions/checkout 插件，将代码仓库克隆到运行环境中
+      - uses: actions/checkout@v4
+
+      # 步骤名称，用于在 GitHub Actions 界面中标识该步骤
+      - name: Set up Go
+        # 使用 actions/setup-go 插件，设置 Go 开发环境
+        uses: actions/setup-go@v4
+        # 配置插件的参数，指定使用的 Go 版本为 1.22
+        with:
+          go-version: '1.22'
+
+      # 使用 Makefile 构建所有平台的可执行文件
+      - name: Build All Platforms
+        run: make buildAll
+
+      # 创建一个新的 GitHub Release
+      - name: Create Release
+        # 为该步骤设置一个唯一的 ID，方便后续步骤引用其输出
+        id: create_release
+        # 使用 actions/create-release 插件来创建 GitHub Release
+        uses: actions/create-release@v1
+        # 设置环境变量，使用 GitHub 提供的令牌进行认证
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 配置插件的参数
+        with:
+          # 发布的标签名称，使用当前推送的标签名称
+          tag_name: ${{ github.ref_name }}
+          # 发布的名称，使用当前推送的标签名称
+          release_name: Release ${{ github.ref_name }}
+          # 是否为草稿版本，这里设置为 false
+          draft: false
+          # 是否为预发布版本，这里设置为 false
+          prerelease: false
+
+      # 上传适用于 Linux amd64 架构的可执行文件到 GitHub Release
+      - name: Upload Linux amd64 Binary
+        # 使用 actions/upload-release-asset 插件上传文件
+        uses: actions/upload-release-asset@v1
+        # 设置环境变量，使用 GitHub 提供的令牌进行认证
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 配置插件的参数
+        with:
+          # 上传文件的目标 URL，从 create_release 步骤的输出中获取
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          # 要上传的文件路径
+          asset_path: ./freessl_amd64
+          # 上传后文件的名称
+          asset_name: freessl_amd64
+          # 上传文件的内容类型
+          asset_content_type: application/octet-stream
+
+      # 上传适用于 Linux arm 架构的可执行文件到 GitHub Release
+      - name: Upload Linux arm Binary
+        # 使用 actions/upload-release-asset 插件上传文件
+        uses: actions/upload-release-asset@v1
+        # 设置环境变量，使用 GitHub 提供的令牌进行认证
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 配置插件的参数
+        with:
+          # 上传文件的目标 URL，从 create_release 步骤的输出中获取
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          # 要上传的文件路径
+          asset_path: ./freessl_arm
+          # 上传后文件的名称
+          asset_name: freessl_arm
+          # 上传文件的内容类型
+          asset_content_type: application/octet-stream
+
+      # 上传适用于 Windows amd64 架构的可执行文件到 GitHub Release
+      - name: Upload Windows amd64 Binary
+        # 使用 actions/upload-release-asset 插件上传文件
+        uses: actions/upload-release-asset@v1
+        # 设置环境变量，使用 GitHub 提供的令牌进行认证
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 配置插件的参数
+        with:
+          # 上传文件的目标 URL，从 create_release 步骤的输出中获取
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          # 要上传的文件路径
+          asset_path: ./freessl_win.exe
+          # 上传后文件的名称
+          asset_name: freessl_win.exe
+          # 上传文件的内容类型
+          asset_content_type: application/octet-stream    
