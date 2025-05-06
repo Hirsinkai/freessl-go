@@ -49,7 +49,7 @@ jobs:
           # 要上传的文件路径
           asset_path: ./freessl_amd64
           # 上传后文件的名称，包含标签信息
-          asset_name: freessl_amd64-${{ github.event.release.tag_name }}
+          asset_name: freessl_amd64_${{ github.event.release.tag_name }}
           # 上传文件的内容类型
           asset_content_type: application/octet-stream
 
@@ -67,7 +67,7 @@ jobs:
           # 要上传的文件路径
           asset_path: ./freessl_arm
           # 上传后文件的名称，包含标签信息
-          asset_name: freessl_arm-${{ github.event.release.tag_name }}
+          asset_name: freessl_arm_${{ github.event.release.tag_name }}
           # 上传文件的内容类型
           asset_content_type: application/octet-stream
 
@@ -85,6 +85,6 @@ jobs:
           # 要上传的文件路径
           asset_path: ./freessl_win.exe
           # 上传后文件的名称，包含标签信息
-          asset_name: freessl_win.exe-${{ github.event.release.tag_name }}
+          asset_name: freessl_win_${{ github.event.release.tag_name }}.exe
           # 上传文件的内容类型
           asset_content_type: application/octet-stream    
