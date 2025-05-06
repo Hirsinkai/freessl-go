@@ -1,10 +1,10 @@
-# This workflow will build a golang project for multiple platforms using Makefile and create a GitHub release
+# This workflow will build a golang project for multiple platforms using Makefile and trigger when a new release is created
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
 # 定义工作流的名称，将显示在 GitHub Actions 界面中
 name: Go Multi-Platform Build and Release with Makefile
 
-# 定义工作流的触发条件，当有新的标签被推送到仓库时触发
+# 定义工作流的触发条件，当创建新的 GitHub Release 时触发
 on:
   release:
     types: [created]
@@ -43,10 +43,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 配置插件的参数
         with:
-          # 发布的标签名称，使用当前推送的标签名称
-          tag_name: ${{ github.ref_name }}
-          # 发布的名称，使用当前推送的标签名称
-          release_name: Release ${{ github.ref_name }}
+          # 使用当前日期和时间以及运行编号生成唯一的标签名称
+          tag_name: release-${{ github.event.release.tag_name }}-${{ github.run_number }}-${{ github.sha | truncate(7) }}
+          # 发布的名称，使用生成的标签名称
+          release_name: Release ${{ github.event.release.tag_name }}-${{ github.run_number }}-${{ github.sha | truncate(7) }}
           # 是否为草稿版本，这里设置为 false
           draft: false
           # 是否为预发布版本，这里设置为 false
@@ -61,12 +61,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 配置插件的参数
         with:
-          # 上传文件的目标 URL，从 create_release 步骤的输出中获取
+          # 上传文件的目标 URL，从 GitHub 上下文获取
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # 要上传的文件路径
           asset_path: ./freessl_amd64
-          # 上传后文件的名称
-          asset_name: freessl_amd64
+          # 上传后文件的名称，包含标签信息
+          asset_name: freessl_amd64-${{ github.event.release.tag_name }}-${{ github.run_number }}-${{ github.sha | truncate(7) }}
           # 上传文件的内容类型
           asset_content_type: application/octet-stream
 
@@ -79,12 +79,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 配置插件的参数
         with:
-          # 上传文件的目标 URL，从 create_release 步骤的输出中获取
+          # 上传文件的目标 URL，从 GitHub 上下文获取
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # 要上传的文件路径
           asset_path: ./freessl_arm
-          # 上传后文件的名称
-          asset_name: freessl_arm
+          # 上传后文件的名称，包含标签信息
+          asset_name: freessl_arm-${{ github.event.release.tag_name }}-${{ github.run_number }}-${{ github.sha | truncate(7) }}
           # 上传文件的内容类型
           asset_content_type: application/octet-stream
 
@@ -97,11 +97,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # 配置插件的参数
         with:
-          # 上传文件的目标 URL，从 create_release 步骤的输出中获取
+          # 上传文件的目标 URL，从 GitHub 上下文获取
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           # 要上传的文件路径
           asset_path: ./freessl_win.exe
-          # 上传后文件的名称
-          asset_name: freessl_win.exe
+          # 上传后文件的名称，包含标签信息
+          asset_name: freessl_win.exe-${{ github.event.release.tag_name }}-${{ github.run_number }}-${{ github.sha | truncate(7) }}
           # 上传文件的内容类型
           asset_content_type: application/octet-stream    
