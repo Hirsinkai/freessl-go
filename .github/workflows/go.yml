@@ -18,7 +18,7 @@ jobs:
     # 定义任务的具体步骤
     steps:
       # 使用 actions/checkout 插件，将代码仓库克隆到运行环境中
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v6
         with:
           # 检出触发 Release 创建的当前分支
           ref: ${{ github.event.release.target_commitish }}
